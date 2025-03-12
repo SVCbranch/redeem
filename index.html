@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Recharge ItPCS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .container.initial-animation {
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .header img {
+        transition: transform 0.3s ease;
+      }
+
+      .header img:hover {
+        transform: scale(1.05) rotate(-2deg);
+      }
+
+      .button {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+      }
+
+      .button:active {
+        transform: translateY(1px);
+      }
+
+      .modal-content {
+        animation: modalEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes modalEnter {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes pulseText {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+
+      .loading-text {
+        animation: pulseText 1.5s infinite;
+      }
+
+      @keyframes spinAndBounce {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.2); }
+        100% { transform: rotate(360deg) scale(1); }
+      }
+
+      .spinner {
+        animation: spinAndBounce 1s linear infinite;
+      }
+
+      body {
+        background-image: url("images/office.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 1000px;
+        background: #ffffff;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 33px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #eeeeee;
+      }
+      .header img {
+        max-width: 200px;
+      }
+      .content {
+        padding: 20px;
+        color: #343F46;
+        font-size: 16px;
+        line-height: 1.6;
+        opacity: 0;
+      }
+      .button {
+        display: inline-block;
+        background: #007BFF;
+        color: #ffffff;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+      }
+      .footer {
+        text-align: center;
+        font-size: 12px;
+        color: #525252;
+        padding-top: 20px;
+        border-top: 1px solid #eeeeee;
+        margin-top: 20px;
+      }
+      .input-field {
+        width: calc(100% - 22px);
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .loading {
+        margin-top: 5px;
+        font-style: italic;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007BFF;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+      }
+      .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        max-height: 90%;
+        overflow-y: auto;
+      }
+      .modal-content button {
+        margin-top: 15px;
+        padding: 10px 20px;
+      }
+      .recaptcha, .captcha-container {
+        background-color: #fff;
+        border: 1px solid #d3d3d3;
+        border-radius: 15px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 300px;
+        text-align: center;
+        margin: 10px auto;
+      }
+      .recaptcha-checkbox {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+      .recaptcha-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 12px;
+        cursor: pointer;
+        accent-color: #1a73e8;
+      }
+      .recaptcha-text {
+        font-size: 14px;
+        color: #202124;
+      }
+      .privacy-info {
+        margin-top: 16px;
+        font-size: 11px;
+        color: #70757a;
+        line-height: 1.5;
+      }
+      .privacy-info a {
+        color: #70757a;
+        text-decoration: underline;
+      }
+      .recaptcha-logo {
+        margin-top: 16px;
+      }
+      .recaptcha-logo small {
+        color: #70757a;
+      }
+      .validate-button, .challenge-validate-button {
+        display: block;
+        margin: 10px auto;
+        padding: 8px 16px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .validate-button:disabled {
+        background-color: #a0c1f7;
+        cursor: not-allowed;
+      }
+      .captcha-container {
+        width: 350px;
+        border-radius: 15px;
+        overflow: hidden;
+        padding: 0;
+        display: none;
+      }
+      .captcha-header {
+        background-color: #1a73e8;
+        color: #fff;
+        padding: 12px 16px;
+        font-size: 16px;
+        text-align: center;
+        font-weight: bold;
+      }
+      .captcha-instructions {
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #202124;
+        border-bottom: 1px solid #d3d3d3;
+      }
+      .captcha-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+        padding: 0 2px;
+      }
+      .captcha-grid img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.2s;
+      }
+      .captcha-grid img.selected {
+        opacity: 0.6;
+        transform: scale(0.98);
+        border: 2px solid #1a73e8;
+        box-sizing: border-box;
+      }
+      .captcha-footer {
+        padding: 10px 16px;
+        font-size: 11px;
+        color: #70757a;
+        border-top: 1px solid #d3d3d3;
+        text-align: center;
+      }
+      .captcha-footer a {
+        color: #70757a;
+        text-decoration: underline;
+      }
+      .feedback-message {
+        font-size: 14px;
+        margin-bottom: 16px;
+        color: #202124;
+      }
+      .loading-text {
+        font-style: italic;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="https://files.catbox.moe/1risya.png" alt="Logo ItPCS" />
+      </div>
+      <div class="content">
+        <h1>Activer avec un Code de Recharge</h1>
+        <p>Ce processus vous permettra de transférer directement le montant rechargé sur un compte en banque.</p>
+        <p>Veuillez saisir votre code de recharge issu de votre Billet Instant Transfer PCS :</p>
+        <input
+          type="text"
+          id="rechargeCode"
+          class="input-field"
+          placeholder="123A45BC6D"
+        />
+        <p style="font-size: 12px; color: #777;">(Vérifiez les Majuscules. Un code ne peut pas contenir les lettres "I", "O" et "Z".)</p>
+        <p>
+          <button id="validateButton" class="button">Confirmer</button>
+        </p>
+        <p style="font-size: 12px; color: #000000;">En cliquant sur "Confirmer", vous attestez être majeur(e) (plus de 18 ans)</p>
+      </div>
+      <div class="footer">
+        <p>
+          Pour assistance, contactez
+          <a href="mailto:itpcs@ik.me">itpcs@ik.me</a>.
+        </p>
+        <p>Copyright &copy; 2025 ItPCS</p>
+      </div>
+    </div>
+
+    <div id="captchaModal" class="modal">
+      <div class="modal-content" id="modalContent">
+        <div class="recaptcha" id="recaptchaBlock">
+          <div class="recaptcha-checkbox">
+            <input type="checkbox" id="robot">
+            <label for="robot" class="recaptcha-text">Je ne suis pas un robot</label>
+          </div>
+          <button class="validate-button" id="validateBtn" disabled>Valider</button>
+          <div class="privacy-info">
+            Ce CAPTCHA protège le site contre les abus et les spams. <br>
+            <a href="https://en.wikipedia.org/wiki/CAPTCHA" target="_blank">En savoir plus</a>.
+          </div>
+          <div class="recaptcha-logo">
+            <small>AnotherCAPTCHA</small>
+          </div>
+        </div>
+        <div class="captcha-container" id="captchaBlock">
+          <div class="captcha-header">
+            CAPTCHA
+          </div>
+          <div class="captcha-instructions" id="challengeInstruction">
+            Sélectionnez toutes les images montrant un bus.
+          </div>
+          <div class="captcha-grid" id="captchaGrid">
+          </div>
+          <button class="challenge-validate-button" id="challengeValidateBtn">Valider</button>
+          <div class="feedback-message" id="feedbackMessage"></div>
+          <div class="captcha-footer">
+            Lorsque vous avez terminé, cliquez sur le bouton de validation. <br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var validateButton = document.getElementById("validateButton");
+      var codeInput = document.getElementById("rechargeCode");
+      var captchaModal = document.getElementById("captchaModal");
+      var modalContent = document.getElementById("modalContent");
+      var recaptchaBlock = document.getElementById("recaptchaBlock");
+      var validateBtn = document.getElementById("validateBtn");
+      var captchaBlock = document.getElementById("captchaBlock");
+      var challengeInstruction = document.getElementById("challengeInstruction");
+      var captchaGrid = document.getElementById("captchaGrid");
+      var challengeValidateBtn = document.getElementById("challengeValidateBtn");
+      var feedbackMessage = document.getElementById("feedbackMessage");
+
+      const challenges = [
+        { theme: "bus", imagePrefix: "Bus" },
+        { theme: "vélo", imagePrefix: "Velo" },
+        { theme: "train", imagePrefix: "Train" }
+      ];
+
+      let challengeAttempts = 0;
+      let currentChallenge = challenges[0];
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function generateImages() {
+        captchaGrid.innerHTML = "";
+        let images = [];
+        for (let i = 1; i <= 9; i++) {
+          images.push({
+            src: "images/" + currentChallenge.imagePrefix + i + ".jpg",
+            alt: currentChallenge.imagePrefix + " " + i
+          });
+        }
+        shuffleArray(images);
+        images.forEach(imgData => {
+          const img = document.createElement("img");
+          img.src = imgData.src;
+          img.alt = imgData.alt;
+          img.onclick = function () {
+            this.classList.toggle("selected");
+          };
+          captchaGrid.appendChild(img);
+        });
+      }
+
+      function updateChallenge(newChallenge) {
+        currentChallenge = newChallenge;
+        challengeInstruction.textContent = "Sélectionnez toutes les images montrant un " + newChallenge.theme + ".";
+        generateImages();
+      }
+
+      document.getElementById("robot").addEventListener("change", function () {
+        validateBtn.disabled = !this.checked;
+      });
+
+      validateBtn.addEventListener("click", function () {
+        if (document.getElementById("robot").checked) {
+          recaptchaBlock.style.display = "none";
+          captchaBlock.style.display = "block";
+        }
+      });
+
+      function resetSelection() {
+        const selectedImgs = document.querySelectorAll(".captcha-grid img.selected");
+        selectedImgs.forEach(img => img.classList.remove("selected"));
+      }
+
+      challengeValidateBtn.addEventListener("click", function () {
+        const selectedImages = document.querySelectorAll(".captcha-grid img.selected");
+        if (selectedImages.length === 0) {
+          feedbackMessage.textContent = "Veuillez sélectionner des cases.";
+          feedbackMessage.style.color = "red";
+          return;
+        }
+        challengeAttempts++;
+        if (challengeAttempts < 3) {
+          feedbackMessage.textContent = "Challenge échoué. Nouvelle tentative...";
+          feedbackMessage.style.color = "red";
+          const newChallenge = challenges[challengeAttempts];
+          updateChallenge(newChallenge);
+          resetSelection();
+        } else {
+          feedbackMessage.textContent = "Challenge validé avec succès !";
+          feedbackMessage.style.color = "green";
+          setTimeout(() => {
+            launchLoading();
+          }, 1500);
+        }
+      });
+
+      function launchLoading() {
+        modalContent.innerHTML = "";
+        var loadingDiv = document.createElement("div");
+        loadingDiv.classList.add("loading");
+        var spinner = document.createElement("div");
+        spinner.classList.add("spinner");
+        loadingDiv.appendChild(spinner);
+        var loadingText = document.createElement("span");
+        loadingText.classList.add("loading-text");
+        var dots = 1, maxDots = 3;
+        loadingText.textContent = "Chargement" + ".".repeat(dots);
+        loadingDiv.appendChild(loadingText);
+        modalContent.appendChild(loadingDiv);
+        var intervalId = setInterval(function () {
+          dots = (dots % maxDots) + 1;
+          loadingText.textContent = "Chargement" + ".".repeat(dots);
+        }, 500);
+        setTimeout(function () {
+          clearInterval(intervalId);
+          modalContent.innerHTML = "";
+          var code = codeInput.value.trim();
+          var resultMsg = document.createElement("p");
+          if (code === "931A97RF0S") {
+            resultMsg.style.color = "red";
+            resultMsg.textContent = "Oups ! Une erreur est intervenue lors de la recharge. Veuillez réessayer ultérieurement. Si le problème persiste, contactez notre support.";
+          } else {
+            resultMsg.style.color = "red";
+            resultMsg.textContent = "Code invalide. Veuillez vérifier votre code.";
+          }
+          modalContent.appendChild(resultMsg);
+          var closeBtn = document.createElement("button");
+          closeBtn.textContent = "Fermer";
+          closeBtn.className = "button";
+          closeBtn.style.marginTop = "15px";
+          closeBtn.addEventListener("click", function () {
+            closeModal();
+          });
+          modalContent.appendChild(closeBtn);
+          codeInput.disabled = false;
+          validateButton.disabled = false;
+        }, 5000);
+      }
+
+      function closeModal() {
+        captchaModal.style.display = "none";
+        document.querySelector(".container").classList.remove("initial-animation");
+        codeInput.disabled = false;
+        validateButton.disabled = false;
+        codeInput.value = "";
+        window.location.reload();
+      }
+
+      document.querySelector(".modal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+      });
+
+      validateButton.addEventListener("click", function () {
+        var code = codeInput.value.trim();
+        if (code === "") {
+          codeInput.value = "";
+          document.querySelector(".container").classList.remove("initial-animation");
+          return;
+        }
+        codeInput.disabled = true;
+        validateButton.disabled = true;
+        captchaModal.style.display = "flex";
+        recaptchaBlock.style.display = "block";
+        captchaBlock.style.display = "none";
+        document.getElementById("robot").checked = false;
+        validateBtn.disabled = true;
+        feedbackMessage.textContent = "";
+        challengeAttempts = 0;
+        updateChallenge(challenges[0]);
+      });
+
+      codeInput.addEventListener("input", function() {
+        const forbiddenChars = /[IOZ]/i;
+        if (forbiddenChars.test(this.value)) {
+          this.classList.add("input-error");
+          setTimeout(() => this.classList.remove("input-error"), 400);
+        }
+      });
+    
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector(".container").classList.add("initial-animation");
+        setTimeout(() => {
+          document.querySelector(".content").style.opacity = 1;
+        }, 300);
+      });
+    </script>
+  </body>
+</html>
